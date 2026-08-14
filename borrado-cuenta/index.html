@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eliminar cuenta</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #616e7c;
+      --border: #d2d6dc;
+      --accent: #d64545;
+      --accent-hover: #b93838;
+      --success: #1f7a4d;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15181c;
+        --card: #1f242a;
+        --text: #e8eaed;
+        --muted: #9aa5b1;
+        --border: #3a4149;
+        --success: #4cc38a;
+      }
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+
+    input[type="email"]:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      border-color: transparent;
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+
+    .check input {
+      margin-top: 0.2rem;
+      width: 1.05rem;
+      height: 1.05rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .check span {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      font-weight: 400;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button:hover:not(:disabled) { background: var(--accent-hover); }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .result {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .result .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .result h2 {
+      font-size: 1.15rem;
+      color: var(--success);
+      margin-bottom: 0.5rem;
+    }
+
+    .result p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 100;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-size: 1.35rem;
+    }
+
+    .modal-close {
+      width: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 0.2rem 0.4rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { background: none; color: var(--text); }
+
+    .modal-body {
+      overflow-y: auto;
+      padding: 1.5rem 1.75rem;
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    .modal-body p { margin-bottom: 1rem; }
+    .modal-body p:last-child { margin-bottom: 0; }
+
+    .modal-footer {
+      padding: 1rem 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-footer button {
+      font-size: 1.1rem;
+      padding: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <form id="delete-form" novalidate>
+      <h1>Eliminar cuenta</h1>
+      <p class="desc">
+        Introduce el correo electrónico asociado a tu cuenta para solicitar su
+        eliminación. Esta acción borrará tu cuenta y todos los datos asociados
+        de forma permanente de la aplicación de GS Gate.
+      </p>
+
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required autocomplete="email">
+
+      <label class="check">
+        <input type="checkbox" id="accept" required>
+        <span>Acepto los términos y quiero borrar mi cuenta</span>
+      </label>
+
+      <button type="submit" id="submit-btn" disabled>Solicitar eliminación</button>
+    </form>
+
+    <div class="result" id="result">
+      <div class="icon">✅</div>
+      <h2>Solicitud recibida</h2>
+      <p>
+        Hemos registrado tu solicitud de eliminación para
+        <strong id="result-email"></strong>. Tu cuenta y tus datos serán
+        eliminados en un plazo máximo de 30 días.
+      </p>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="terms-title">Importante sobre la eliminación de información</h2>
+        <button type="button" class="modal-close" id="terms-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>
+          La eliminación de una cuenta o de los datos asociados en
+          <strong>GS Gate</strong> únicamente elimina la información
+          almacenada y controlada directamente por <strong>Embaboo Software</strong>
+          dentro de nuestra aplicación y nuestros sistemas.
+        </p>
+        <p>
+          <strong>La eliminación de datos en GS Gate no elimina, modifica
+          ni cancela la información que exista en HikConnect/HikCentral
+          Connect.</strong>
+        </p>
+        <p>
+          Los datos relacionados con el residente, vivienda, accesos u otra
+          información administrada directamente por
+          <strong>HikConnect/HikCentral Connect</strong> continuarán existiendo
+          en dicha plataforma aun después de eliminar la cuenta de GS Gate.
+        </p>
+        <p>
+          Si el usuario desea solicitar la eliminación de la información
+          almacenada en HikConnect/HikCentral Connect, deberá
+          <strong>ponerse en contacto directamente con la administración de su
+          fraccionamiento o residencial</strong>, ya que dicha información es
+          gestionada por ellos y no puede ser eliminada por Embaboo Software
+          desde GS Gate.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="terms-accept">Acepto</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('delete-form');
+    const emailInput = document.getElementById('email');
+    const accept = document.getElementById('accept');
+    const btn = document.getElementById('submit-btn');
+    const result = document.getElementById('result');
+
+    function updateButton() {
+      btn.disabled = !(accept.checked && emailInput.validity.valid);
+    }
+
+    emailInput.addEventListener('input', updateButton);
+    accept.addEventListener('change', updateButton);
+
+    const modal = document.getElementById('terms-modal');
+    const termsAccept = document.getElementById('terms-accept');
+    const termsClose = document.getElementById('terms-close');
+
+    // Al intentar marcar el checkbox se abren los términos; solo queda
+    // marcado si el usuario pulsa "Acepto" dentro del popup.
+    accept.addEventListener('click', function (e) {
+      if (!accept.checked) return; // desmarcar sí se permite directamente
+      e.preventDefault();
+      accept.checked = false;
+      updateButton();
+      modal.classList.add('open');
+      modal.querySelector('.modal-body').scrollTop = 0;
+    });
+
+    function closeModal(accepted) {
+      modal.classList.remove('open');
+      accept.checked = accepted;
+      updateButton();
+    }
+
+    termsAccept.addEventListener('click', function () { closeModal(true); });
+    termsClose.addEventListener('click', function () { closeModal(false); });
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal(false);
+    });
+
+    const API_URL = 'https://apihikconnectdev.onrender.com/api/auth/account';
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (!emailInput.validity.valid || !accept.checked) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Eliminando…';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput.value })
+        });
+
+        if (!res.ok) {
+          let msg = 'No se pudo procesar la solicitud. Inténtalo de nuevo más tarde.';
+          try {
+            const data = await res.json();
+            const apiMsg = data && (data.detail || data.message || data.error || data.title);
+            if (apiMsg) msg = apiMsg;
+          } catch (_) { /* respuesta sin JSON */ }
+          throw new Error(msg);
+        }
+
+        document.getElementById('result-email').textContent = emailInput.value;
+        form.style.display = 'none';
+        result.style.display = 'block';
+      } catch (err) {
+        alert(err instanceof TypeError
+          ? 'No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.'
+          : err.message);
+        btn.textContent = 'Solicitar eliminación';
+        updateButton();
+      }
+    });
+  </script>
+</body>
+</html>
